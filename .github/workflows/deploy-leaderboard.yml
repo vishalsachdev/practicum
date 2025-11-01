@@ -35,17 +35,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Set up GitHub CLI
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          echo "$GH_TOKEN" | gh auth login --with-token
-          gh auth setup-git
-
       - name: Build leaderboard JSON
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # GitHub CLI will automatically use GH_TOKEN environment variable
           python3 tools/build_leaderboard.py data/students.csv web/leaderboard.json --days 7
           echo "Leaderboard JSON generated successfully"
 
