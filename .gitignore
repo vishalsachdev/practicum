@@ -21,5 +21,5 @@ logs/
 .env.local
 
 # Personal data
-data/
+# data/  # Commented out so leaderboard can access students.csv
 plan.md
