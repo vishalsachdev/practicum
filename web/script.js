@@ -70,7 +70,6 @@ function renderLeaderboard(students, viewMode) {
         let html = `
             <div class="rank ${rankClass}">${rank === '-' ? '—' : rank}</div>
             <div class="student-info">
-                <div class="student-name">${escapeHtml(student.name)}</div>
                 <div class="student-repo">
                     <span>📦</span>
                     <a href="https://github.com/${student.repo}" target="_blank" rel="noopener noreferrer">
