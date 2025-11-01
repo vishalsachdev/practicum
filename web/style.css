@@ -66,6 +66,42 @@ header h1 {
     color: var(--border);
 }
 
+.info-banner {
+    background: #dbeafe;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 0 auto 30px;
+    max-width: 900px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.info-banner p {
+    margin: 0;
+    color: #1e40af;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.info-banner a {
+    color: #1e40af;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: #3b82f6;
+    text-underline-offset: 2px;
+    transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.info-banner a:hover {
+    color: #1e3a8a;
+    text-decoration-color: #1e40af;
+}
+
+.info-banner strong {
+    font-weight: 600;
+}
+
 .loading {
     text-align: center;
     padding: 60px 20px;
