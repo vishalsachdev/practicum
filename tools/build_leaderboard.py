@@ -10,8 +10,13 @@ import sys
 from typing import Dict, List, Optional, Tuple
 
 
-def sh(cmd: list, input: Optional[str] = None) -> Tuple[int, str, str]:
-    p = subprocess.run(cmd, input=input, text=True, capture_output=True)
+def sh(cmd: list, input: Optional[str] = None, env: Optional[dict] = None) -> Tuple[int, str, str]:
+    # If env is provided, merge with existing environment
+    run_env = None
+    if env:
+        run_env = os.environ.copy()
+        run_env.update(env)
+    p = subprocess.run(cmd, input=input, text=True, capture_output=True, env=run_env)
     return p.returncode, p.stdout, p.stderr
 
 
@@ -50,12 +55,18 @@ def iso(dt_obj: dt.datetime) -> str:
 
 
 def gh_json(args: list) -> Optional[object]:
+    # GitHub CLI automatically uses GH_TOKEN or GITHUB_TOKEN from environment
+    # Just pass the environment through
     code, out, err = sh(["gh", "api", *args])
     if code != 0:
+        # Print error for debugging (can be removed later)
+        if err:
+            print(f"Warning: GitHub API call failed: {err}", file=sys.stderr)
         return None
     try:
         return json.loads(out)
-    except Exception:
+    except Exception as e:
+        print(f"Warning: Failed to parse JSON: {e}", file=sys.stderr)
         return None
 
 

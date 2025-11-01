@@ -35,13 +35,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Verify GitHub CLI
+        run: |
+          gh --version
+          echo "GitHub CLI is available"
+
       - name: Build leaderboard JSON
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           # GitHub CLI will automatically use GH_TOKEN environment variable
+          echo "Building leaderboard..."
           python3 tools/build_leaderboard.py data/students.csv web/leaderboard.json --days 7
           echo "Leaderboard JSON generated successfully"
+          # Show a sample of the output for debugging
+          head -30 web/leaderboard.json || echo "Failed to read leaderboard.json"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
