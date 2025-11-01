@@ -65,12 +65,10 @@ async function handleRequest(request) {
   // Log for debugging
   console.log(`Request: ${hostname} -> Subdomain: ${subdomain}`);
 
-  // Handle root domain and www
+  // Let root domain pass through (don't intercept)
+  // This allows illinihunt.org to be handled by its Vercel deployment
   if (isRootDomain) {
-    return new Response('illinihunt.org - Subdomain proxy active\nConfigured subdomains: ' + Object.keys(SUBDOMAIN_MAP).join(', '), {
-      status: 200,
-      headers: { 'Content-Type': 'text/plain' }
-    });
+    return fetch(request);
   }
 
   // Check if subdomain is mapped
