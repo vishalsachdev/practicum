@@ -14,9 +14,15 @@ def generate_worker_code(subdomain_map):
     """Generate the complete Cloudflare Worker JavaScript code"""
 
     # Convert subdomain map to JavaScript object literal
+    # Supports both project IDs (for bolt.host) and full URLs
     js_map_entries = []
-    for subdomain, bolt_id in subdomain_map.items():
-        js_map_entries.append(f'  "{subdomain}": "{bolt_id}"')
+    for subdomain, target in subdomain_map.items():
+        # If target looks like a URL, use it as-is, otherwise assume bolt.host project ID
+        if target.startswith('http://') or target.startswith('https://'):
+            js_map_entries.append(f'  "{subdomain}": "{target}"')
+        else:
+            # Legacy format: just project ID, assume bolt.host
+            js_map_entries.append(f'  "{subdomain}": "https://{target}.bolt.host"')
 
     js_map = ",\n".join(js_map_entries) if js_map_entries else "  // No subdomains configured yet"
 
@@ -56,9 +62,9 @@ async function handleRequest(request) {{
   }}
 
   // Check if subdomain is mapped
-  const boltProjectId = SUBDOMAIN_MAP[subdomain];
+  const targetBase = SUBDOMAIN_MAP[subdomain];
 
-  if (!boltProjectId) {{
+  if (!targetBase) {{
     return new Response(`Subdomain "${{subdomain}}" not configured\\nAvailable: ${{Object.keys(SUBDOMAIN_MAP).join(', ')}}`, {{
       status: 404,
       headers: {{ 'Content-Type': 'text/plain' }}
@@ -66,9 +72,18 @@ async function handleRequest(request) {{
   }}
 
   // Build target URL
-  const targetUrl = `https://${{boltProjectId}}.bolt.host${{url.pathname}}${{url.search}}`;
+  // targetBase can be either a full URL or a project ID (legacy)
+  let targetUrl;
+  if (targetBase.startsWith('http://') || targetBase.startsWith('https://')) {{
+    // Full URL format
+    const baseUrl = new URL(targetBase);
+    targetUrl = `${{baseUrl.origin}}${{url.pathname}}${{url.search}}`;
+  }} else {{
+    // Legacy project ID format (assume bolt.host)
+    targetUrl = `https://${{targetBase}}.bolt.host${{url.pathname}}${{url.search}}`;
+  }}
 
-  // Create new request to bolt.host
+  // Create new request to target
   const modifiedRequest = new Request(targetUrl, {{
     method: request.method,
     headers: request.headers,
@@ -76,7 +91,7 @@ async function handleRequest(request) {{
     redirect: 'follow'
   }});
 
-  // Fetch from bolt.host
+  // Fetch from target
   const response = await fetch(modifiedRequest);
 
   // Create response with modified headers
@@ -128,8 +143,12 @@ def main():
 
     if subdomain_map:
         print("\\nSubdomains:")
-        for subdomain, bolt_id in subdomain_map.items():
-            print(f"  • {subdomain}.illinihunt.org -> {bolt_id}.bolt.host")
+        for subdomain, target in subdomain_map.items():
+            # Display target correctly (full URL or project ID)
+            if target.startswith('http://') or target.startswith('https://'):
+                print(f"  • {subdomain}.illinihunt.org -> {target}")
+            else:
+                print(f"  • {subdomain}.illinihunt.org -> {target}.bolt.host")
     else:
         print("⚠️  No subdomains configured yet")
         print("   Add entries to subdomains.json")

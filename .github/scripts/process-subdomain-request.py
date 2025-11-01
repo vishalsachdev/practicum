@@ -43,16 +43,27 @@ def validate_subdomain(subdomain):
 
 
 def validate_bolt_url(url):
-    """Validate and extract bolt.host project ID"""
+    """Validate and extract target URL (supports bolt.host, vercel.app, etc.)"""
 
     # Match bolt.host or bolt.new URLs
-    match = re.match(r'https?://([a-z0-9-]+)\.bolt\.(host|new)/?', url, re.IGNORECASE)
+    bolt_match = re.match(r'https?://([a-z0-9-]+)\.bolt\.(host|new)/?', url, re.IGNORECASE)
+    if bolt_match:
+        project_id = bolt_match.group(1)
+        return project_id, ""
 
-    if not match:
-        return None, "Invalid bolt.host URL format. Must be: https://project-id.bolt.host/"
+    # Match vercel.app URLs (store as full URL)
+    vercel_match = re.match(r'(https?://[a-z0-9-]+\.vercel\.app)/?', url, re.IGNORECASE)
+    if vercel_match:
+        full_url = vercel_match.group(1)
+        return full_url, ""
 
-    project_id = match.group(1)
-    return project_id, ""
+    # Match other common platforms (netlify, render, fly.io, etc.)
+    other_match = re.match(r'(https?://[a-z0-9-]+\.(netlify\.app|onrender\.com|fly\.dev))/?', url, re.IGNORECASE)
+    if other_match:
+        full_url = other_match.group(1)
+        return full_url, ""
+
+    return None, "Invalid URL format. Supported: bolt.host, vercel.app, netlify.app, onrender.com, fly.dev"
 
 
 def update_subdomains_config(subdomain, project_id, action):
