@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# Personal data
+data/
+plan.md

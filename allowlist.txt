@@ -1,0 +1,8 @@
+# Student GitHub Usernames Allowlist
+# Add one GitHub username per line
+# Students must be in this list to submit subdomain requests via issues
+# Lines starting with # are comments
+
+# Example:
+# student-username1
+# student-username2

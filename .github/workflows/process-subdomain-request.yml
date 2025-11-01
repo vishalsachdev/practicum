@@ -1,0 +1,205 @@
+name: Process Subdomain Request
+
+on:
+  issues:
+    types: [opened, edited]
+
+# Concurrency control: prevent duplicate runs for same issue
+concurrency:
+  group: subdomain-request-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  process-request:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'subdomain-request')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check allowlist
+        id: check_allowlist
+        run: |
+          USERNAME="${{ github.event.issue.user.login }}"
+          echo "Checking if user '$USERNAME' is in allowlist..."
+
+          # Remove comments and empty lines from allowlist
+          ALLOWED_USERS=$(grep -v '^#' allowlist.txt | grep -v '^$' || true)
+
+          if echo "$ALLOWED_USERS" | grep -q "^${USERNAME}$"; then
+            echo "✅ User is authorized"
+            echo "authorized=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ User is not authorized"
+            echo "authorized=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment - Unauthorized
+        if: steps.check_allowlist.outputs.authorized == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ **Authorization Failed**
+
+              Sorry @${{ github.event.issue.user.login }}, you are not authorized to request subdomains.
+
+              Please contact the course instructor if you believe this is an error.`
+            })
+
+      - name: Exit if unauthorized
+        if: steps.check_allowlist.outputs.authorized == 'false'
+        run: exit 1
+
+      - name: Process subdomain request
+        id: process
+        run: |
+          echo "Processing subdomain request..."
+
+          # Make script executable
+          chmod +x .github/scripts/process-subdomain-request.py
+
+          # Process the issue (pass issue body as argument)
+          ISSUE_BODY=$(cat <<'EOF'
+          ${{ github.event.issue.body }}
+          EOF
+          )
+
+          # Run parser and capture output
+          OUTPUT=$(.github/scripts/process-subdomain-request.py "$ISSUE_BODY" 2>&1)
+          EXIT_CODE=$?
+
+          echo "$OUTPUT"
+
+          # Save output for later steps
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Extract info from output
+          SUBDOMAIN=$(echo "$OUTPUT" | grep "^SUBDOMAIN:" | cut -d' ' -f2)
+          PROJECT_ID=$(echo "$OUTPUT" | grep "^PROJECT_ID:" | cut -d' ' -f2)
+          URL=$(echo "$OUTPUT" | grep "^URL:" | cut -d' ' -f2)
+
+          echo "subdomain=$SUBDOMAIN" >> $GITHUB_OUTPUT
+          echo "project_id=$PROJECT_ID" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+          exit $EXIT_CODE
+
+      - name: Comment - Validation Failed
+        if: failure() && steps.process.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ **Validation Failed**
+
+              @${{ github.event.issue.user.login }}, there was an error processing your request:
+
+              \`\`\`
+              ${{ steps.process.outputs.output }}
+              \`\`\`
+
+              Please check the issue template and fix the errors above.`
+            })
+
+      - name: Generate worker code
+        if: success()
+        run: |
+          echo "Generating Cloudflare Worker code..."
+          python3 generate-worker.py
+
+      - name: Set up Node.js
+        if: success()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        if: success()
+        run: npm install -g wrangler
+
+      - name: Deploy to Cloudflare
+        if: success()
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          echo "Deploying to Cloudflare..."
+          wrangler deploy
+
+      - name: Commit changes
+        if: success()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add subdomains.json cloudflare-worker.js
+          git commit -m "Add subdomain: ${{ steps.process.outputs.subdomain }} -> ${{ steps.process.outputs.project_id }}
+
+          Requested by: @${{ github.event.issue.user.login }}
+          Issue: #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment - Success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ **Subdomain Deployed Successfully!**
+
+              @${{ github.event.issue.user.login }}, your subdomain has been configured and deployed.
+
+              **Details:**
+              - **Subdomain:** \`${{ steps.process.outputs.subdomain }}\`
+              - **URL:** ${{ steps.process.outputs.url }}
+              - **Bolt Project:** \`${{ steps.process.outputs.project_id }}.bolt.host\`
+
+              Your site should be live in 1-2 minutes. Please allow time for DNS propagation.
+
+              If you encounter any issues, please comment on this issue.`
+            })
+
+            // Close the issue
+            github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              labels: ['subdomain-request', 'deployed']
+            })
+
+      - name: Comment - Deployment Failed
+        if: failure() && steps.process.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ **Deployment Failed**
+
+              @${{ github.event.issue.user.login }}, your request was validated but deployment failed.
+
+              Please contact the course instructor or check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            })
