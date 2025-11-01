@@ -1,0 +1,302 @@
+{
+  "generated_at": "2025-11-01T23:29:26Z",
+  "window_days": 7,
+  "students": [
+    {
+      "name": "De Guzman, Alex",
+      "repo": "Alexdgzmn/BADM-372M_System",
+      "owner": "Alexdgzmn",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Delgado, Bianca",
+      "repo": "bi-an-ca/LongLinkApp-FV",
+      "owner": "bi-an-ca",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Dyser, Justin",
+      "repo": "Sirlizard/net-umbrella",
+      "owner": "Sirlizard",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Hernandez, Brian",
+      "repo": "BriHernandezz3/AI_Tone_Match_App",
+      "owner": "BriHernandezz3",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Jiwani, Anand",
+      "repo": "anandjiwani/moneynova-1-bolt",
+      "owner": "anandjiwani",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Lat, Halima",
+      "repo": "hmlat2/thinker-app",
+      "owner": "hmlat2",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Monago, Grace",
+      "repo": "gmonago2/FeaturesandAuth",
+      "owner": "gmonago2",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Pati, Priya",
+      "repo": "pati3-oss/bolt_project",
+      "owner": "pati3-oss",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Quinn, Holden",
+      "repo": "holdenpquinn-lab/FridgeMate",
+      "owner": "holdenpquinn-lab",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Rizvi, Muhammad Ali",
+      "repo": "muhammadalirizvi2005/CORE",
+      "owner": "muhammadalirizvi2005",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Stein, Charlie",
+      "repo": "cestein2-coder/Dorm-Plate",
+      "owner": "cestein2-coder",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Thorat, Kunal",
+      "repo": "kunalthoratt/Bolt_wardrobe_app",
+      "owner": "kunalthoratt",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Whetstone, Tyler",
+      "repo": "whetstone261/GitHub",
+      "owner": "whetstone261",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    },
+    {
+      "name": "Zhou, iris",
+      "repo": "iriszhou-dotcom/YoungerUApp",
+      "owner": "iriszhou-dotcom",
+      "metrics": {
+        "commits_7d": 0,
+        "commit_days_7d": 0,
+        "commits_30d": 0,
+        "pr_opened_7d": 0,
+        "pr_merged_7d": 0,
+        "streak": 0,
+        "score": 0
+      },
+      "badges": []
+    }
+  ],
+  "leaderboard": [
+    {
+      "name": "De Guzman, Alex",
+      "repo": "Alexdgzmn/BADM-372M_System",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Delgado, Bianca",
+      "repo": "bi-an-ca/LongLinkApp-FV",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Dyser, Justin",
+      "repo": "Sirlizard/net-umbrella",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Hernandez, Brian",
+      "repo": "BriHernandezz3/AI_Tone_Match_App",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Jiwani, Anand",
+      "repo": "anandjiwani/moneynova-1-bolt",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Lat, Halima",
+      "repo": "hmlat2/thinker-app",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Monago, Grace",
+      "repo": "gmonago2/FeaturesandAuth",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Pati, Priya",
+      "repo": "pati3-oss/bolt_project",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Quinn, Holden",
+      "repo": "holdenpquinn-lab/FridgeMate",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Rizvi, Muhammad Ali",
+      "repo": "muhammadalirizvi2005/CORE",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Stein, Charlie",
+      "repo": "cestein2-coder/Dorm-Plate",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Thorat, Kunal",
+      "repo": "kunalthoratt/Bolt_wardrobe_app",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Whetstone, Tyler",
+      "repo": "whetstone261/GitHub",
+      "score": 0,
+      "rank": 1
+    },
+    {
+      "name": "Zhou, iris",
+      "repo": "iriszhou-dotcom/YoungerUApp",
+      "score": 0,
+      "rank": 1
+    }
+  ]
+}

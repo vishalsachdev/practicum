@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Activity Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏆 GitHub Activity Leaderboard</h1>
+            <p class="subtitle">Student engagement metrics and rankings</p>
+            <div class="meta">
+                <span id="generated-at">Loading...</span>
+                <span class="separator">•</span>
+                <span>Last <span id="window-days">7</span> days</span>
+            </div>
+        </header>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading leaderboard data...</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <p>⚠️ Failed to load leaderboard data. Please ensure <code>leaderboard.json</code> exists.</p>
+        </div>
+
+        <div id="leaderboard-container" style="display: none;">
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-students">0</div>
+                    <div class="stat-label">Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-commits">0</div>
+                    <div class="stat-label">Total Commits (7d)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-prs">0</div>
+                    <div class="stat-label">PRs Merged (7d)</div>
+                </div>
+            </div>
+
+            <div class="leaderboard">
+                <div class="leaderboard-header">
+                    <h2>Top Contributors</h2>
+                    <div class="view-toggle">
+                        <button id="view-comprehensive" class="active">Comprehensive</button>
+                        <button id="view-simple">Simple</button>
+                    </div>
+                </div>
+                <div id="leaderboard-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

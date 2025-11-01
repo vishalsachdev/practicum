@@ -84,7 +84,7 @@ def search_total(q: str) -> int:
 
 def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
     rows = parse_csv(csv_path)
-    now = dt.datetime.utcnow()
+    now = dt.datetime.now(dt.timezone.utc)
     since7 = now - dt.timedelta(days=days_window)
     since30 = now - dt.timedelta(days=30)
 

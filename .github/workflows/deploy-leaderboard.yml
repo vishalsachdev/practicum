@@ -1,0 +1,63 @@
+name: Deploy Leaderboard to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/students.csv'
+      - 'tools/build_leaderboard.py'
+      - 'web/**'
+      - '.github/workflows/deploy-leaderboard.yml'
+  workflow_dispatch:  # Allow manual triggering
+  schedule:
+    # Run daily at 6 AM UTC to keep leaderboard fresh
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up GitHub CLI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "$GH_TOKEN" | gh auth login --with-token
+          gh auth setup-git
+
+      - name: Build leaderboard JSON
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/build_leaderboard.py data/students.csv web/leaderboard.json --days 7
+          echo "Leaderboard JSON generated successfully"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './web'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
