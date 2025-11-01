@@ -34,7 +34,7 @@ const SUBDOMAIN_MAP = {
   "tonematchai-v1": "https://tone-match-ai-app-la-btsw.bolt.host",
   "tonematchai-v2": "https://new-chat-nce2.bolt.host",
   "youngeru-v1": "https://youngeru-landing-pag-t1z3.bolt.host",
-  "localoop": "https://localoop-mobile-even-vb7c.bolt.host",
+  "localoop": "https://localoop-test-update.bolt.host",
   "longlink": "https://longlink-app-a7dy.bolt.host",
   "net-umbrella": "https://net-umbrella-friends-an16.bolt.host",
   "tonematchai": "https://ai-email-tone-matchi-ztwh.bolt.host",
