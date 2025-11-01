@@ -296,6 +296,48 @@ header h1 {
     text-decoration: underline;
 }
 
+.student-urls {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.url-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.illinihunt-link {
+    background: #f0f9ff;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.illinihunt-link:hover {
+    background: #e0f2fe;
+    color: #075985;
+    border-color: #7dd3fc;
+}
+
+.bolt-link {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.bolt-link:hover {
+    background: #fde68a;
+    color: #78350f;
+    border-color: #fcd34d;
+}
+
 .badges {
     display: flex;
     gap: 8px;

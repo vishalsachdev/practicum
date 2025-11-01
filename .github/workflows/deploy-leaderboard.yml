@@ -50,7 +50,7 @@ jobs:
         run: |
           # GitHub CLI will automatically use GH_TOKEN environment variable
           echo "Building leaderboard..."
-          python3 tools/build_leaderboard.py data/students.csv web/leaderboard.json --days 7
+          python3 tools/build_leaderboard.py data/students.csv web/leaderboard.json --days 7 --subdomains subdomains.json
           echo "Leaderboard JSON generated successfully"
           # Show a sample of the output for debugging
           head -30 web/leaderboard.json || echo "Failed to read leaderboard.json"

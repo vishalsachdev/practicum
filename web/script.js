@@ -79,6 +79,22 @@ function renderLeaderboard(students, viewMode) {
                 </div>
         `;
 
+        // Add URLs (illinihunt and bolt.host)
+        if (student.urls) {
+            html += '<div class="student-urls">';
+            if (student.urls.illinihunt) {
+                html += `<a href="${escapeHtml(student.urls.illinihunt)}" target="_blank" rel="noopener noreferrer" class="url-link illinihunt-link">
+                    🌐 ${escapeHtml(student.urls.illinihunt.replace('https://', ''))}
+                </a>`;
+            }
+            if (student.urls.bolt) {
+                html += `<a href="${escapeHtml(student.urls.bolt)}" target="_blank" rel="noopener noreferrer" class="url-link bolt-link">
+                    🔗 ${escapeHtml(student.urls.bolt.replace('https://', '').replace('http://', ''))}
+                </a>`;
+            }
+            html += '</div>';
+        }
+
         if (viewMode === 'comprehensive') {
             // Badges
             if (student.badges && student.badges.length > 0) {

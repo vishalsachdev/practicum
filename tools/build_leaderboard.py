@@ -93,8 +93,44 @@ def search_total(q: str) -> int:
     return int(data.get("total_count", 0))
 
 
-def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
+def load_subdomains(subdomains_path: str = "subdomains.json") -> Dict[str, str]:
+    """Load subdomain mappings from JSON file"""
+    try:
+        with open(subdomains_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("subdomains", {})
+    except Exception:
+        return {}
+
+
+def extract_bolt_project_id(app_url: str) -> Optional[str]:
+    """Extract bolt.host project ID from URL"""
+    if not app_url:
+        return None
+    app_url = app_url.strip().rstrip("/")
+    # Match patterns like https://project-id.bolt.host or project-id.bolt.host
+    import re
+    match = re.search(r"([a-z0-9-]+)\.bolt\.host", app_url, re.I)
+    if match:
+        return match.group(1)
+    return None
+
+
+def find_subdomain_for_bolt_id(bolt_id: str, subdomains: Dict[str, str]) -> Optional[str]:
+    """Find subdomain name that maps to this bolt project ID"""
+    for subdomain, mapped_id in subdomains.items():
+        # Handle both project IDs and full URLs
+        if mapped_id == bolt_id:
+            return subdomain
+        # Also check if mapped_id contains the bolt_id (for full URLs)
+        if bolt_id in mapped_id:
+            return subdomain
+    return None
+
+
+def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "subdomains.json") -> Dict:
     rows = parse_csv(csv_path)
+    subdomains = load_subdomains(subdomains_path)
     now = dt.datetime.now(dt.timezone.utc)
     since7 = now - dt.timedelta(days=days_window)
     since30 = now - dt.timedelta(days=30)
@@ -172,6 +208,31 @@ def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
         if commits_7d >= 5:
             badges.append("commit-cadence")
 
+        # Get App URL and find subdomain
+        app_url = (r.get("App URL") or r.get("app url") or "").strip()
+        bolt_id = extract_bolt_project_id(app_url)
+        subdomain_name = None
+        illinihunt_url = None
+        
+        if bolt_id:
+            # Find subdomain that maps to this bolt project ID
+            subdomain_name = find_subdomain_for_bolt_id(bolt_id, subdomains)
+            if subdomain_name:
+                illinihunt_url = f"https://{subdomain_name}.illinihunt.org"
+        
+        # Normalize bolt URL
+        bolt_url = None
+        if app_url:
+            app_url = app_url.strip().rstrip("/")
+            if "bolt.host" in app_url:
+                if not app_url.startswith("http"):
+                    bolt_url = f"https://{app_url}"
+                else:
+                    bolt_url = app_url
+            elif app_url.startswith("http"):
+                # Full URL (e.g., Vercel)
+                bolt_url = app_url
+
         students.append(
             {
                 "name": name or owner,
@@ -187,6 +248,10 @@ def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
                     "score": score,
                 },
                 "badges": badges,
+                "urls": {
+                    "bolt": bolt_url,
+                    "illinihunt": illinihunt_url,
+                },
             }
         )
 
@@ -215,9 +280,10 @@ def main():
     ap.add_argument("csv", help="Path to CSV, e.g. data/students.csv")
     ap.add_argument("out", help="Output JSON path, e.g. web/leaderboard.json")
     ap.add_argument("--days", type=int, default=7, help="Window in days (default 7)")
+    ap.add_argument("--subdomains", default="subdomains.json", help="Path to subdomains.json (default: subdomains.json)")
     args = ap.parse_args()
 
-    data = build_from_csv(args.csv, days_window=args.days)
+    data = build_from_csv(args.csv, days_window=args.days, subdomains_path=args.subdomains)
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
