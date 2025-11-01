@@ -12,7 +12,7 @@ assignees: ''
 
 **Bolt.host URL:** (e.g., https://my-project-abc123.bolt.host/)
 
-**Action:** (new or update)
+**Action:** (optional - leave blank to auto-detect, or specify: new/update)
 
 ---
 
@@ -31,7 +31,7 @@ assignees: ''
 ### Instructions:
 1. Fill in your desired subdomain name (lowercase, alphanumeric, hyphens allowed)
 2. Provide your full bolt.host, Vercel, or other supported platform URL
-3. Specify if this is a new subdomain or an update to an existing one
+3. (Optional) Specify action - leave blank and it will auto-detect if this is new or an update
 4. Submit the issue
 
 The automation will:

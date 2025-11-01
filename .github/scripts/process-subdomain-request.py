@@ -23,7 +23,7 @@ def parse_issue_body(body):
 
     subdomain = subdomain_match.group(1).strip()
     url = url_match.group(1).strip()
-    action = action_match.group(1).strip().lower() if action_match else 'new'
+    action = action_match.group(1).strip().lower() if action_match else 'auto'
 
     return subdomain, url, action
 
@@ -82,11 +82,15 @@ def update_subdomains_config(subdomain, project_id, action):
     # Check if subdomain exists
     exists = subdomain in subdomains
 
+    # Auto-detect action if not explicitly specified
+    if action == 'auto':
+        action = 'update' if exists else 'new'
+
     if action == 'new' and exists:
-        return False, f"Subdomain '{subdomain}' already exists. Use 'update' action to modify it."
+        return False, f"Subdomain '{subdomain}' already exists. Use 'update' action to modify it, or omit the Action field to auto-detect."
 
     if action == 'update' and not exists:
-        return False, f"Subdomain '{subdomain}' does not exist. Use 'new' action to create it."
+        return False, f"Subdomain '{subdomain}' does not exist. Use 'new' action to create it, or omit the Action field to auto-detect."
 
     # Update subdomain
     old_value = subdomains.get(subdomain)
