@@ -3,6 +3,18 @@
 # Students must be in this list to submit subdomain requests via issues
 # Lines starting with # are comments
 
-# Example:
-# student-username1
-# student-username2
+# BADM 350 Students (Course ID: badm_350_120255_247989)
+Alexdgzmn
+bi-an-ca
+Sirlizard
+BriHernandezz3
+anandjiwani
+hmlat2
+gmonago2
+pati3-oss
+holdenpquinn-lab
+muhammadalirizvi2005
+cestein2-coder
+kunalthoratt
+whetstone261
+iriszhou-dotcom
