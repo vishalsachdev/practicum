@@ -37,6 +37,25 @@ Students can request subdomains by creating a GitHub issue, and the system autom
 - Maximum 50 characters
 - Examples: `myproject-v1`, `student-portfolio`, `demo-site`
 
+### Naming Convention for Student Startups
+
+**Version Suffixes (`-v1`, `-v2`):**
+- Used for **landing pages** showcasing your startup concept
+- Example: `moneynova-v1.illinihunt.org` → Landing page for MoneyNova startup
+- Typically created during ideation/pitch phase
+- Can have multiple versions as you iterate (`-v1`, `-v2`, etc.)
+
+**No Suffix:**
+- Used for **MVP (Minimum Viable Product) applications**
+- Example: `moneynova.illinihunt.org` → Working MoneyNova app
+- Represents your actual functional product
+- Direct, clean URL for your live application
+
+**Why this matters:**
+- Landing pages (versioned) can change frequently without affecting your MVP URL
+- MVP URL (`yourproject.illinihunt.org`) remains stable for users and testing
+- Clear separation between marketing/landing content and functional app
+
 ### What If My Request Fails?
 
 The automation will comment on your issue with the specific error. Common issues:
