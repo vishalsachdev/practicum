@@ -111,9 +111,10 @@ def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
         owner, repo = nr
         author = owner  # assume repo owner is the student
 
-        # Commits
-        commits7 = commits_since(owner, repo, iso(since7), author)
-        commits30 = commits_since(owner, repo, iso(since30), author)
+        # Commits - don't filter by author as some commits may not have GitHub login
+        # This ensures we capture all commits, including those from org repos or commits without login
+        commits7 = commits_since(owner, repo, iso(since7), author=None)
+        commits30 = commits_since(owner, repo, iso(since30), author=None)
 
         # Unique commit days for last 7
         days7 = set()
@@ -125,6 +126,7 @@ def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
                 pass
 
         # PRs opened and merged in last 7
+        # Note: We still filter PRs by author since PRs typically have GitHub logins
         since_date = since7.date().isoformat()
         q_opened = f"repo:{owner}/{repo} is:pr author:{author} created:>={since_date}"
         q_merged = f"repo:{owner}/{repo} is:pr author:{author} is:merged merged:>={since_date}"
