@@ -45,8 +45,8 @@ jobs:
       - name: Build leaderboard JSON
         env:
           # Use PAT if available (for private repos), otherwise fallback to github.token
-          # Note: Create GITHUB_TOKEN_SECRET in repo settings -> Secrets and variables -> Actions
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN_SECRET != '' && secrets.GITHUB_TOKEN_SECRET || github.token }}
+          # Note: Create LEADERBOARD_GITHUB_TOKEN in repo settings -> Secrets and variables -> Actions
+          GH_TOKEN: ${{ secrets.LEADERBOARD_GITHUB_TOKEN != '' && secrets.LEADERBOARD_GITHUB_TOKEN || github.token }}
         run: |
           # GitHub CLI will automatically use GH_TOKEN environment variable
           echo "Building leaderboard..."
