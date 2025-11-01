@@ -40,21 +40,30 @@ Students can request subdomains by creating a GitHub issue, and the system autom
 ### Naming Convention for Student Startups
 
 **Version Suffixes (`-v1`, `-v2`):**
-- Used for **landing pages** showcasing your startup concept
-- Example: `moneynova-v1.illinihunt.org` → Landing page for MoneyNova startup
-- Typically created during ideation/pitch phase
-- Can have multiple versions as you iterate (`-v1`, `-v2`, etc.)
+- Used for **teaser campaign landing pages** at the **pre-launch phase**
+- Example: `moneynova-v1.illinihunt.org` → Pre-launch teaser for MoneyNova
+- Purpose: Build awareness, collect early signups, gauge interest before MVP launch
+- Can have multiple versions as you test different messaging (`-v1`, `-v2`, etc.)
+- Temporary URLs for marketing campaigns
 
 **No Suffix:**
 - Used for **MVP (Minimum Viable Product) applications**
-- Example: `moneynova.illinihunt.org` → Working MoneyNova app
+- Example: `moneynova.illinihunt.org` → Live MoneyNova app
 - Represents your actual functional product
 - Direct, clean URL for your live application
+- This is your permanent production URL
+
+**Typical Student Workflow:**
+1. **Pre-launch Phase:** Deploy teaser landing page at `project-v1.illinihunt.org`
+2. **Test & Iterate:** Update messaging with `project-v2.illinihunt.org`
+3. **Launch Phase:** Deploy MVP app at `project.illinihunt.org`
+4. **Post-launch:** MVP URL becomes canonical, teaser pages archived
 
 **Why this matters:**
-- Landing pages (versioned) can change frequently without affecting your MVP URL
-- MVP URL (`yourproject.illinihunt.org`) remains stable for users and testing
-- Clear separation between marketing/landing content and functional app
+- Teaser campaigns (versioned) won't interfere with your MVP launch
+- MVP URL (`yourproject.illinihunt.org`) remains stable for users and investors
+- Clear separation between pre-launch marketing and functional product
+- Professional, clean URL for your production application
 
 ### What If My Request Fails?
 

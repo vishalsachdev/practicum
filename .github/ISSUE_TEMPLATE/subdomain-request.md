@@ -18,11 +18,15 @@ assignees: ''
 
 ### Naming Convention
 
-**For Landing Pages:** Use `-v1`, `-v2` suffix
-Example: `myproject-v1` → `myproject-v1.illinihunt.org`
+**For Pre-Launch Teaser Campaigns:** Use `-v1`, `-v2` suffix
+- Purpose: Build awareness, collect signups, test messaging before MVP launch
+- Example: `myproject-v1` → `myproject-v1.illinihunt.org`
+- These are temporary marketing URLs
 
-**For MVP Apps:** No suffix
-Example: `myproject` → `myproject.illinihunt.org`
+**For MVP Applications:** No suffix
+- Purpose: Your live, functional product
+- Example: `myproject` → `myproject.illinihunt.org`
+- This is your permanent production URL
 
 ### Instructions:
 1. Fill in your desired subdomain name (lowercase, alphanumeric, hyphens allowed)
