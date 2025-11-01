@@ -31,12 +31,14 @@ git push -u origin main
 
 1. Go to https://dash.cloudflare.com/profile/api-tokens
 2. Click **Create Token**
-3. Use **Edit Cloudflare Workers** template
-4. Or create custom token with permissions:
+3. Create custom token with permissions:
    - Account: `Workers Scripts:Edit`
    - Zone: `illinihunt.org` → `Workers Routes:Edit`
-5. Click **Continue to Summary** → **Create Token**
-6. **Copy the token** (you'll only see it once!)
+   - Zone: `illinihunt.org` → `DNS:Edit` (for automatic DNS record creation)
+4. Click **Continue to Summary** → **Create Token**
+5. **Copy the token** (you'll only see it once!)
+
+**Note:** The token needs DNS edit permissions to automatically create DNS records for new subdomains.
 
 ### 3. Add GitHub Secret
 

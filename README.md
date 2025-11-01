@@ -22,6 +22,7 @@ Students can request subdomains by creating a GitHub issue, and the system autom
 3. **Wait for automation** (usually 1-2 minutes):
    - The system checks if you're authorized
    - Validates your request
+   - Creates DNS record automatically
    - Deploys your subdomain
    - Comments back with status
 
@@ -88,9 +89,10 @@ Add secret:
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. Click **My Profile** → **API Tokens**
 3. Click **Create Token**
-4. Use template **Edit Cloudflare Workers** or create custom with:
+4. Create custom token with permissions:
    - Account: `Workers Scripts:Edit`
-   - Zone: `illinihunt.org` with `Workers Routes:Edit`
+   - Zone: `illinihunt.org` → `Workers Routes:Edit`
+   - Zone: `illinihunt.org` → `DNS:Edit` (for automatic DNS record creation)
 5. Copy the token and add as GitHub secret
 
 #### 4. Test the Workflow
@@ -158,9 +160,11 @@ Update subdomains.json
     ↓
 Generate cloudflare-worker.js
     ↓
-Deploy via Wrangler
+Create DNS Record (via Cloudflare API)
     ↓
-Comment on Issue (Success/Failure)
+Deploy Worker via Wrangler
+    ↓
+Commit Changes → Comment on Issue (Success/Failure)
 ```
 
 ### Files
@@ -172,6 +176,7 @@ Comment on Issue (Success/Failure)
 - **`allowlist.txt`** - Authorized student GitHub usernames
 - **`.github/workflows/process-subdomain-request.yml`** - GitHub Actions workflow
 - **`.github/scripts/process-subdomain-request.py`** - Issue parser and validator
+- **`.github/scripts/manage-dns.py`** - DNS record management via Cloudflare API
 - **`.github/ISSUE_TEMPLATE/subdomain-request.md`** - Issue template for students
 
 ### Security Features
