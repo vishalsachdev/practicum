@@ -51,7 +51,11 @@ def normalize_repo(url: str) -> Optional[Tuple[str, str]]:
 
 
 def iso(dt_obj: dt.datetime) -> str:
-    return dt_obj.replace(microsecond=0).isoformat() + "Z"
+    # Convert to UTC if timezone-aware, otherwise assume UTC
+    if dt_obj.tzinfo is not None:
+        dt_obj = dt_obj.astimezone(dt.timezone.utc)
+    # Format as ISO8601 with Z suffix
+    return dt_obj.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def gh_json(args: list) -> Optional[object]:
@@ -71,15 +75,11 @@ def gh_json(args: list) -> Optional[object]:
 
 
 def commits_since(owner: str, repo: str, since_iso: str, author: Optional[str]) -> List[dict]:
-    args = [
-        f"/repos/{owner}/{repo}/commits",
-        "-F",
-        f"since={since_iso}",
-        "-F",
-        "per_page=100",
-    ]
+    # Build query string for GitHub API
+    query_params = f"since={since_iso}&per_page=100"
     if author:
-        args += ["-F", f"author={author}"]
+        query_params += f"&author={author}"
+    args = [f"/repos/{owner}/{repo}/commits?{query_params}"]
     data = gh_json(args)
     if not isinstance(data, list):
         return []
