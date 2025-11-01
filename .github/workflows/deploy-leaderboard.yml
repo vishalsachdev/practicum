@@ -18,6 +18,8 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  # Note: github.token has limited access to private repos
+  # For private repos, use GITHUB_TOKEN_SECRET (PAT) instead
 
 concurrency:
   group: "pages"
@@ -42,7 +44,9 @@ jobs:
 
       - name: Build leaderboard JSON
         env:
-          GH_TOKEN: ${{ github.token }}
+          # Use PAT if available (for private repos), otherwise fallback to github.token
+          # Note: Create GITHUB_TOKEN_SECRET in repo settings -> Secrets and variables -> Actions
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN_SECRET != '' && secrets.GITHUB_TOKEN_SECRET || github.token }}
         run: |
           # GitHub CLI will automatically use GH_TOKEN environment variable
           echo "Building leaderboard..."
