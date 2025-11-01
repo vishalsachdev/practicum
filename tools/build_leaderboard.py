@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+import argparse
+import csv
+import datetime as dt
+import json
+import os
+import re
+import subprocess
+import sys
+from typing import Dict, List, Optional, Tuple
+
+
+def sh(cmd: list, input: Optional[str] = None) -> Tuple[int, str, str]:
+    p = subprocess.run(cmd, input=input, text=True, capture_output=True)
+    return p.returncode, p.stdout, p.stderr
+
+
+def parse_csv(csv_path: str) -> List[dict]:
+    rows: List[dict] = []
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            rows.append(r)
+    return rows
+
+
+def normalize_repo(url: str) -> Optional[Tuple[str, str]]:
+    if not url:
+        return None
+    url = url.strip()
+    if not url:
+        return None
+    if "://" in url:
+        m = re.search(r"github\.com/([^/]+)/([^/#?]+)", url, re.I)
+        if not m:
+            return None
+        owner, repo = m.group(1), m.group(2)
+    else:
+        parts = url.split("/")
+        if len(parts) != 2:
+            return None
+        owner, repo = parts
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+    return owner, repo
+
+
+def iso(dt_obj: dt.datetime) -> str:
+    return dt_obj.replace(microsecond=0).isoformat() + "Z"
+
+
+def gh_json(args: list) -> Optional[object]:
+    code, out, err = sh(["gh", "api", *args])
+    if code != 0:
+        return None
+    try:
+        return json.loads(out)
+    except Exception:
+        return None
+
+
+def commits_since(owner: str, repo: str, since_iso: str, author: Optional[str]) -> List[dict]:
+    args = [
+        f"/repos/{owner}/{repo}/commits",
+        "-F",
+        f"since={since_iso}",
+        "-F",
+        "per_page=100",
+    ]
+    if author:
+        args += ["-F", f"author={author}"]
+    data = gh_json(args)
+    if not isinstance(data, list):
+        return []
+    return data
+
+
+def search_total(q: str) -> int:
+    data = gh_json(["/search/issues", "-F", f"q={q}"])
+    if not isinstance(data, dict):
+        return 0
+    return int(data.get("total_count", 0))
+
+
+def build_from_csv(csv_path: str, days_window: int = 7) -> Dict:
+    rows = parse_csv(csv_path)
+    now = dt.datetime.utcnow()
+    since7 = now - dt.timedelta(days=days_window)
+    since30 = now - dt.timedelta(days=30)
+
+    students: List[Dict] = []
+    for r in rows:
+        name = (r.get("Name") or r.get("name") or "").strip()
+        url = (r.get("Github URL") or r.get("github url") or r.get("github") or "").strip()
+        if not url:
+            continue
+        nr = normalize_repo(url)
+        if not nr:
+            continue
+        owner, repo = nr
+        author = owner  # assume repo owner is the student
+
+        # Commits
+        commits7 = commits_since(owner, repo, iso(since7), author)
+        commits30 = commits_since(owner, repo, iso(since30), author)
+
+        # Unique commit days for last 7
+        days7 = set()
+        for c in commits7:
+            try:
+                d = c["commit"]["author"]["date"][:10]
+                days7.add(d)
+            except Exception:
+                pass
+
+        # PRs opened and merged in last 7
+        since_date = since7.date().isoformat()
+        q_opened = f"repo:{owner}/{repo} is:pr author:{author} created:>={since_date}"
+        q_merged = f"repo:{owner}/{repo} is:pr author:{author} is:merged merged:>={since_date}"
+        pr_opened_7d = search_total(q_opened)
+        pr_merged_7d = search_total(q_merged)
+
+        # Streak (based on last 30 days commit dates)
+        dayset = set()
+        for c in commits30:
+            try:
+                d = c["commit"]["author"]["date"][:10]
+                dayset.add(d)
+            except Exception:
+                pass
+        streak = 0
+        cur = now.date()
+        while True:
+            key = cur.isoformat()
+            if key in dayset:
+                streak += 1
+                cur = cur - dt.timedelta(days=1)
+            else:
+                break
+
+        # Score
+        commits_7d = len(commits7)
+        commit_days_7d = len(days7)
+        score = (
+            commits_7d * 1
+            + commit_days_7d * 2
+            + pr_opened_7d * 3
+            + pr_merged_7d * 5
+        )
+
+        # Badges
+        badges = []
+        if streak >= 7:
+            badges.append("week-warrior")
+        if pr_opened_7d >= 1:
+            badges.append("pr-starter")
+        if pr_merged_7d >= 1:
+            badges.append("merge-master")
+        if commits_7d >= 5:
+            badges.append("commit-cadence")
+
+        students.append(
+            {
+                "name": name or owner,
+                "repo": f"{owner}/{repo}",
+                "owner": owner,
+                "metrics": {
+                    "commits_7d": commits_7d,
+                    "commit_days_7d": commit_days_7d,
+                    "commits_30d": len(commits30),
+                    "pr_opened_7d": pr_opened_7d,
+                    "pr_merged_7d": pr_merged_7d,
+                    "streak": streak,
+                    "score": score,
+                },
+                "badges": badges,
+            }
+        )
+
+    # Leaderboard
+    students.sort(key=lambda s: (-s["metrics"]["score"], -s["metrics"]["streak"], s["name"].lower()))
+    leaderboard = []
+    rank = 0
+    last_score = None
+    for s in students:
+        sc = s["metrics"]["score"]
+        if sc != last_score:
+            rank = len(leaderboard) + 1
+            last_score = sc
+        leaderboard.append({"name": s["name"], "repo": s["repo"], "score": sc, "rank": rank})
+
+    return {
+        "generated_at": iso(now),
+        "window_days": days_window,
+        "students": students,
+        "leaderboard": leaderboard,
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Build a static leaderboard JSON from a frozen CSV.")
+    ap.add_argument("csv", help="Path to CSV, e.g. data/students.csv")
+    ap.add_argument("out", help="Output JSON path, e.g. web/leaderboard.json")
+    ap.add_argument("--days", type=int, default=7, help="Window in days (default 7)")
+    args = ap.parse_args()
+
+    data = build_from_csv(args.csv, days_window=args.days)
+    os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    print(f"Wrote {args.out}")
+
+
+if __name__ == "__main__":
+    main()
+
