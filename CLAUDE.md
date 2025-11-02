@@ -27,10 +27,11 @@ Automated subdomain management system for `illinihunt.org` using Cloudflare Work
 - Worker handles both formats automatically
 
 ### Auto-Detection Feature
-The `Action` field in issue template is optional. If omitted:
+The `Action` field in issue template is optional. If omitted, defaults to `'auto'`:
 - Script checks if subdomain exists in `subdomains.json`
-- Auto-selects `new` or `update` action
-- Simplifies workflow for students updating URLs
+- Auto-selects `new` (subdomain doesn't exist) or `update` (subdomain exists)
+- Simplifies workflow for students updating URLs without remembering to specify action
+- If student explicitly specifies `new` for existing subdomain, validation fails with helpful error
 
 ### Subdomain Naming Convention
 - **Versioned** (`-v1`, `-v2`): Pre-launch teaser campaign landing pages
@@ -74,14 +75,20 @@ git push
 
 ### DNS Management
 ```bash
-# Create DNS record for subdomain (requires CLOUDFLARE_API_TOKEN env var)
+# Export Cloudflare API token (required for DNS operations)
+export CLOUDFLARE_API_TOKEN="your-token-here"
+
+# Create DNS record for subdomain
 .github/scripts/manage-dns.py create <subdomain-name>
 
-# List all DNS records
+# List all DNS records for illinihunt.org
 .github/scripts/manage-dns.py list
 
 # Delete DNS record
 .github/scripts/manage-dns.py delete <subdomain-name>
+
+# Create multiple DNS records from bulk list
+.github/scripts/create-dns-bulk.sh
 ```
 
 ### Bulk Operations
@@ -109,6 +116,18 @@ gh run view <run-id>
 
 # View failed run logs
 gh run view <run-id> --log-failed
+
+# View issue with comments (to see automation responses)
+gh issue view <issue-number> --comments
+```
+
+### Testing Subdomains
+```bash
+# Test all configured subdomains for accessibility
+./test-subdomains.sh
+
+# Test all bolt.host source URLs
+./test-urls.sh
 ```
 
 ## Critical Files
@@ -131,9 +150,11 @@ gh run view <run-id> --log-failed
 
 ### Scripts
 - **`generate-worker.py`**: Reads `subdomains.json`, generates `cloudflare-worker.js`
-- **`.github/scripts/process-subdomain-request.py`**: Parses issue body, validates input, updates config
-- **`.github/scripts/manage-dns.py`**: Creates/deletes/lists DNS records via Cloudflare API
+- **`.github/scripts/process-subdomain-request.py`**: Parses issue body, validates input, updates config. Outputs structured data: `SUBDOMAIN:`, `PROJECT_ID:`, `URL:`
+- **`.github/scripts/manage-dns.py`**: Creates/deletes/lists DNS records via Cloudflare API (requires `CLOUDFLARE_API_TOKEN` env var)
 - **`.github/scripts/bulk-setup.py`**: Bulk subdomain configuration from text lists
+- **`test-subdomains.sh`**: Tests all configured illinihunt.org subdomains for HTTP accessibility
+- **`test-urls.sh`**: Tests all bolt.host source URLs and reports broken links
 
 ### Workflow
 - **`.github/workflows/process-subdomain-request.yml`**: Main automation workflow
@@ -144,7 +165,7 @@ gh run view <run-id> --log-failed
 ## Important Patterns
 
 ### Cloudflare Worker Reverse Proxy
-The worker intercepts requests to `*.illinihunt.org` subdomains and proxies to target URLs (bolt.host, Vercel, etc.). The root domain (`illinihunt.org`) passes through to its Vercel deployment.
+The worker intercepts requests to `*.illinihunt.org` subdomains and proxies to target URLs (bolt.host, Vercel, etc.). The root domain (`illinihunt.org`) and `www` subdomain pass through unmodified to allow the IlliniHunt platform (hosted on Vercel) to handle them. This passthrough is critical - without it, the worker would intercept and break the main platform.
 
 ### Error Handling in Workflow
 Workflow uses step outputs to track success/failure:
@@ -154,6 +175,20 @@ Workflow uses step outputs to track success/failure:
 
 ### DNS Record Management
 All DNS records are CNAME records pointing to root domain (`illinihunt.org`) with Cloudflare proxy enabled (`proxied: true`). This allows the worker to intercept and route requests.
+
+### Validation Rules
+Subdomain names must:
+- Be lowercase alphanumeric with hyphens only
+- Start and end with alphanumeric character (not hyphen)
+- Be 50 characters or less
+- Match regex: `^[a-z0-9][a-z0-9-]*[a-z0-9]$`
+
+Supported URL formats:
+- **bolt.host**: `https://project-id.bolt.host` or `https://project-id.bolt.new`
+- **Vercel**: `https://project-name.vercel.app`
+- **Netlify**: `https://project-name.netlify.app`
+- **Render**: `https://project-name.onrender.com`
+- **Fly.io**: `https://project-name.fly.dev`
 
 ## Secrets Required
 
@@ -189,9 +224,10 @@ Students submit issue with same subdomain name, different URL. Script auto-detec
 
 ### Workflow Failures
 - **"not authorized"**: GitHub username not in `allowlist.txt` (check exact match, case-sensitive)
-- **"subdomain already exists"**: Student used `Action: new` for existing subdomain (or omit Action field)
+- **"subdomain already exists"**: Student used `Action: new` for existing subdomain (solution: omit Action field or use `Action: update`)
 - **"deployment failed"**: Check `CLOUDFLARE_API_TOKEN` secret, verify token permissions
-- **"nothing to commit"**: Subdomain URL unchanged (not an error, but workflow exits)
+- **"nothing to commit"**: Subdomain URL unchanged (not an error, but workflow exits with failure)
+- **Empty error message in issue comment**: Parser script failed before outputting structured error (check workflow logs with `gh run view <run-id> --log-failed`)
 
 ### Subdomain Not Working
 1. Verify DNS record exists: `.github/scripts/manage-dns.py list | grep <subdomain>`
