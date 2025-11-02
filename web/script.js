@@ -92,20 +92,12 @@ function renderLeaderboard(students, viewMode) {
                 </div>
         `;
 
-        // Add URLs (illinihunt and bolt.host) - only show if not already shown as primary
-        if (student.urls) {
+        // Add URLs (bolt.host only - illinihunt is already shown as primary identifier)
+        if (student.urls && student.urls.bolt) {
             html += '<div class="student-urls">';
-            // Only show illinihunt URL if it wasn't used as primary identifier
-            if (student.urls.illinihunt && !primaryLink.includes('github.com')) {
-                html += `<a href="${escapeHtml(student.urls.illinihunt)}" target="_blank" rel="noopener noreferrer" class="url-link illinihunt-link">
-                    🌐 ${escapeHtml(student.urls.illinihunt.replace('https://', ''))}
-                </a>`;
-            }
-            if (student.urls.bolt) {
-                html += `<a href="${escapeHtml(student.urls.bolt)}" target="_blank" rel="noopener noreferrer" class="url-link bolt-link">
-                    🔗 ${escapeHtml(student.urls.bolt.replace('https://', '').replace('http://', ''))}
-                </a>`;
-            }
+            html += `<a href="${escapeHtml(student.urls.bolt)}" target="_blank" rel="noopener noreferrer" class="url-link bolt-link">
+                🔗 ${escapeHtml(student.urls.bolt.replace('https://', '').replace('http://', ''))}
+            </a>`;
             html += '</div>';
         }
 
