@@ -146,7 +146,10 @@ function renderLeaderboard(students, viewMode) {
         }
 
         html += '</div>';
-        html += `<div class="score">${student.metrics.score}</div>`;
+        html += `<div class="score">
+            <div class="score-value">${student.metrics.score}</div>
+            <div class="score-label">Score</div>
+        </div>`;
         html += '</div>';
 
         item.innerHTML = html;

@@ -449,11 +449,27 @@ header h1 {
 }
 
 .score {
+    min-width: 80px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.score-value {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary);
-    min-width: 80px;
-    text-align: right;
+    line-height: 1.2;
+}
+
+.score-label {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
 /* Simple view styles */
