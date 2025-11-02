@@ -136,7 +136,10 @@ function renderLeaderboard(students, viewMode) {
                 <div class="metric-value">${student.metrics.pr_merged_7d}</div>
             </div>`;
             html += `<div class="metric">
-                <div class="metric-label">Streak</div>
+                <div class="metric-label">
+                    Streak
+                    <span class="info-icon" title="Consecutive days with commits, counting backwards from today">ℹ️</span>
+                </div>
                 <div class="metric-value">${student.metrics.streak} 🔥</div>
             </div>`;
             html += '</div>';

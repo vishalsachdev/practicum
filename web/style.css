@@ -424,6 +424,22 @@ header h1 {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.info-icon {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    cursor: help;
+    font-style: normal;
+    user-select: none;
+}
+
+.info-icon:hover {
+    opacity: 1;
 }
 
 .metric-value {
