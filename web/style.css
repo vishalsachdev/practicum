@@ -293,11 +293,21 @@ header h1 {
     min-width: 0;
 }
 
-.student-name {
+.student-domain {
+    margin-bottom: 6px;
+}
+
+.primary-domain-link {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
+    color: var(--primary);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.primary-domain-link:hover {
+    text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 .student-repo {

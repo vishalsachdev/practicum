@@ -67,9 +67,23 @@ function renderLeaderboard(students, viewMode) {
         const rank = student.metrics.score > 0 ? index + 1 : '-';
         const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
 
+        // Determine primary identifier - use illinihunt domain if available, otherwise repo name
+        const primaryIdentifier = student.urls && student.urls.illinihunt 
+            ? student.urls.illinihunt.replace('https://', '') 
+            : student.repo;
+        
+        const primaryLink = student.urls && student.urls.illinihunt
+            ? student.urls.illinihunt
+            : `https://github.com/${student.repo}`;
+
         let html = `
             <div class="rank ${rankClass}">${rank === '-' ? '—' : rank}</div>
             <div class="student-info">
+                <div class="student-domain">
+                    <a href="${escapeHtml(primaryLink)}" target="_blank" rel="noopener noreferrer" class="primary-domain-link">
+                        ${escapeHtml(primaryIdentifier)}
+                    </a>
+                </div>
                 <div class="student-repo">
                     <span>📦</span>
                     <a href="https://github.com/${student.repo}" target="_blank" rel="noopener noreferrer">
@@ -78,10 +92,11 @@ function renderLeaderboard(students, viewMode) {
                 </div>
         `;
 
-        // Add URLs (illinihunt and bolt.host)
+        // Add URLs (illinihunt and bolt.host) - only show if not already shown as primary
         if (student.urls) {
             html += '<div class="student-urls">';
-            if (student.urls.illinihunt) {
+            // Only show illinihunt URL if it wasn't used as primary identifier
+            if (student.urls.illinihunt && !primaryLink.includes('github.com')) {
                 html += `<a href="${escapeHtml(student.urls.illinihunt)}" target="_blank" rel="noopener noreferrer" class="url-link illinihunt-link">
                     🌐 ${escapeHtml(student.urls.illinihunt.replace('https://', ''))}
                 </a>`;
