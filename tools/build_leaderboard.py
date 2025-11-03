@@ -58,19 +58,22 @@ def iso(dt_obj: dt.datetime) -> str:
     return dt_obj.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+VERBOSE = os.getenv("LEADERBOARD_VERBOSE") == "1"
+
+
 def gh_json(args: list) -> Optional[object]:
     # GitHub CLI automatically uses GH_TOKEN or GITHUB_TOKEN from environment
     # Just pass the environment through
     code, out, err = sh(["gh", "api", *args])
     if code != 0:
-        # Print error for debugging (can be removed later)
-        if err:
+        if VERBOSE and err:
             print(f"Warning: GitHub API call failed: {err}", file=sys.stderr)
         return None
     try:
         return json.loads(out)
     except Exception as e:
-        print(f"Warning: Failed to parse JSON: {e}", file=sys.stderr)
+        if VERBOSE:
+            print(f"Warning: Failed to parse JSON: {e}", file=sys.stderr)
         return None
 
 
@@ -91,6 +94,21 @@ def search_total(q: str) -> int:
     if not isinstance(data, dict):
         return 0
     return int(data.get("total_count", 0))
+
+
+def has_repo_access(owner: str, repo: str) -> bool:
+    """Return True if the current token can view the repo (public or collaborator)."""
+    code, out, err = sh([
+        "gh",
+        "repo",
+        "view",
+        f"{owner}/{repo}",
+        "--json",
+        "name",
+        "-q",
+        ".name",
+    ])
+    return code == 0 and (out.strip() != "")
 
 
 def load_subdomains(subdomains_path: str = "subdomains.json") -> Dict[str, str]:
@@ -136,6 +154,7 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
     since30 = now - dt.timedelta(days=30)
 
     students: List[Dict] = []
+    skipped: List[Dict] = []
     for r in rows:
         name = (r.get("Name") or r.get("name") or "").strip()
         url = (r.get("Github URL") or r.get("github url") or r.get("github") or "").strip()
@@ -145,6 +164,10 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
         if not nr:
             continue
         owner, repo = nr
+        # Skip quietly if no access (private or missing)
+        if not has_repo_access(owner, repo):
+            skipped.append({"name": name or owner, "repo": f"{owner}/{repo}", "reason": "no_access_or_missing"})
+            continue
         author = owner  # assume repo owner is the student
 
         # Commits - don't filter by author as some commits may not have GitHub login
@@ -272,6 +295,7 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
         "window_days": days_window,
         "students": students,
         "leaderboard": leaderboard,
+        "skipped": skipped,
     }
 
 
@@ -292,4 +316,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
