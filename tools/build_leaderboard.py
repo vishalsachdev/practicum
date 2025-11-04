@@ -170,10 +170,9 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
             continue
         author = owner  # assume repo owner is the student
 
-        # Commits - don't filter by author as some commits may not have GitHub login
-        # This ensures we capture all commits, including those from org repos or commits without login
-        commits7 = commits_since(owner, repo, iso(since7), author=None)
-        commits30 = commits_since(owner, repo, iso(since30), author=None)
+        # Commits — count only the student's commits (author login = repo owner)
+        commits7 = commits_since(owner, repo, iso(since7), author=author)
+        commits30 = commits_since(owner, repo, iso(since30), author=author)
 
         # Unique commit days for last 7
         days7 = set()
