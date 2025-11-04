@@ -40,7 +40,7 @@ const SUBDOMAIN_MAP = {
   "tonematchai": "https://ai-email-tone-matchi-ztwh.bolt.host",
   "moneynova": "https://moneynova-study-abro-kxw0.bolt.host",
   "thinker": "https://student-learning-app-yg75.bolt.host",
-  "firstshares": "https://investing-simplified-xsny.bolt.host",
+  "firstshares": "https://firstshares-scnv.bolt.host",
   "anchor": "https://anchor-ar-vr-wellnes-js3q.bolt.host",
   "fridgemate": "https://fridgemate-student-m-jdth.bolt.host",
   "core": "https://student-productivity-1ni6.bolt.host",
