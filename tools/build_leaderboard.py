@@ -96,6 +96,72 @@ def search_total(q: str) -> int:
     return int(data.get("total_count", 0))
 
 
+def owner_is_org(owner: str) -> bool:
+    """Return True if the GitHub owner is an Organization account."""
+    code, out, err = sh([
+        "gh",
+        "api",
+        f"/users/{owner}",
+        "--jq",
+        ".type",
+    ])
+    if code != 0:
+        return False
+    return out.strip() == "Organization"
+
+
+def pick_login(row: dict, owner: str) -> str:
+    """Choose the GitHub username used to attribute work.
+    Priority: explicit CSV column 'GitHub Username' -> repo owner.
+    """
+    for key in ("GitHub Username", "github username", "github_user", "username"):
+        v = row.get(key)
+        if v and v.strip():
+            return v.strip()
+    return owner
+
+
+def commit_belongs_to_student(commit: dict, login: str, full_name: str) -> bool:
+    """Heuristics to attribute a commit to a student.
+    - Match author.login or committer.login == login
+    - Match noreply email localpart containing login
+    - Weak fallback: both first and last name substrings appear in author/committer names
+    """
+    login_l = (login or "").lower()
+    # Direct login matches
+    auth = (commit.get("author") or {})
+    comm = (commit.get("committer") or {})
+    if (auth.get("login") or "").lower() == login_l:
+        return True
+    if (comm.get("login") or "").lower() == login_l:
+        return True
+
+    # Email/noreply patterns
+    ca = (commit.get("commit") or {}).get("author", {}) or {}
+    cc = (commit.get("commit") or {}).get("committer", {}) or {}
+    emails = [str(ca.get("email") or "").lower(), str(cc.get("email") or "").lower()]
+
+    def noreply_match(e: str) -> bool:
+        if not e:
+            return False
+        if not e.endswith("@users.noreply.github.com"):
+            return False
+        local = e.split("@", 1)[0]
+        return login_l in local
+
+    if any(noreply_match(e) for e in emails):
+        return True
+
+    # Name fallback: require at least two tokens to match
+    name_field = (str(ca.get("name") or "") + " " + str(cc.get("name") or "")).lower()
+    tokens = [t for t in re.split(r"[ ,]+", (full_name or "").lower()) if t]
+    if len(tokens) >= 2:
+        hits = sum(1 for t in tokens if t and t in name_field)
+        if hits >= 2:
+            return True
+    return False
+
+
 def has_repo_access(owner: str, repo: str) -> bool:
     """Return True if the current token can view the repo (public or collaborator)."""
     code, out, err = sh([
@@ -168,11 +234,16 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
         if not has_repo_access(owner, repo):
             skipped.append({"name": name or owner, "repo": f"{owner}/{repo}", "reason": "no_access_or_missing"})
             continue
-        author = owner  # assume repo owner is the student
+        # Pick login (allows CSV override) and attribute commits using heuristics.
+        login = pick_login(r, owner)
 
-        # Commits — count only the student's commits (author login = repo owner)
-        commits7 = commits_since(owner, repo, iso(since7), author=author)
-        commits30 = commits_since(owner, repo, iso(since30), author=author)
+        # Commits in window(s): fetch all, then attribute to student to handle
+        # GitHub Apps (bolt.new, etc.) and org-owned repos.
+        commits7_all = commits_since(owner, repo, iso(since7), author=None)
+        commits30_all = commits_since(owner, repo, iso(since30), author=None)
+
+        commits7 = [c for c in commits7_all if commit_belongs_to_student(c, login, name)]
+        commits30 = [c for c in commits30_all if commit_belongs_to_student(c, login, name)]
 
         # Unique commit days for last 7
         days7 = set()
@@ -183,11 +254,10 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
             except Exception:
                 pass
 
-        # PRs opened and merged in last 7
-        # Note: We still filter PRs by author since PRs typically have GitHub logins
+        # PRs opened and merged in last 7 (filter by chosen login)
         since_date = since7.date().isoformat()
-        q_opened = f"repo:{owner}/{repo} is:pr author:{author} created:>={since_date}"
-        q_merged = f"repo:{owner}/{repo} is:pr author:{author} is:merged merged:>={since_date}"
+        q_opened = f"repo:{owner}/{repo} is:pr author:{login} created:>={since_date}"
+        q_merged = f"repo:{owner}/{repo} is:pr author:{login} is:merged merged:>={since_date}"
         pr_opened_7d = search_total(q_opened)
         pr_merged_7d = search_total(q_merged)
 
