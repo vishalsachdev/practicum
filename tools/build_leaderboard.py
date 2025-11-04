@@ -96,6 +96,28 @@ def search_total(q: str) -> int:
     return int(data.get("total_count", 0))
 
 
+def commits_all_time(owner: str, repo: str) -> int:
+    """Return total commits on the default branch (all-time) via GraphQL."""
+    query = (
+        "query($owner:String!,$repo:String!){"
+        "  repository(owner:$owner,name:$repo){"
+        "    defaultBranchRef{"
+        "      target{"
+        "        ... on Commit { history { totalCount } }"
+        "      }"
+        "    }"
+        "  }"
+        "}"
+    )
+    data = gh_json(["graphql", "-F", f"owner={owner}", "-F", f"repo={repo}", "-f", f"query={query}"])
+    try:
+        return int(
+            data["data"]["repository"]["defaultBranchRef"]["target"]["history"]["totalCount"]
+        )
+    except Exception:
+        return 0
+
+
 def owner_is_org(owner: str) -> bool:
     """Return True if the GitHub owner is an Organization account."""
     code, out, err = sh([
@@ -237,13 +259,9 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
         # Pick login (allows CSV override) and attribute commits using heuristics.
         login = pick_login(r, owner)
 
-        # Commits in window(s): fetch all, then attribute to student to handle
-        # GitHub Apps (bolt.new, etc.) and org-owned repos.
-        commits7_all = commits_since(owner, repo, iso(since7), author=None)
-        commits30_all = commits_since(owner, repo, iso(since30), author=None)
-
-        commits7 = [c for c in commits7_all if commit_belongs_to_student(c, login, name)]
-        commits30 = [c for c in commits30_all if commit_belongs_to_student(c, login, name)]
+        # Commits in window(s): remove author filtering, count all repo commits
+        commits7 = commits_since(owner, repo, iso(since7), author=None)
+        commits30 = commits_since(owner, repo, iso(since30), author=None)
 
         # Unique commit days for last 7
         days7 = set()
@@ -334,6 +352,7 @@ def build_from_csv(csv_path: str, days_window: int = 7, subdomains_path: str = "
                     "commits_7d": commits_7d,
                     "commit_days_7d": commit_days_7d,
                     "commits_30d": len(commits30),
+                    "commits_all_time": commits_all_time(owner, repo),
                     "pr_opened_7d": pr_opened_7d,
                     "pr_merged_7d": pr_merged_7d,
                     "streak": streak,

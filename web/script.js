@@ -123,6 +123,12 @@ function renderLeaderboard(students, viewMode) {
                 <div class="metric-label">Commits (7d)</div>
                 <div class="metric-value">${student.metrics.commits_7d}</div>
             </div>`;
+            if (typeof student.metrics.commits_all_time === 'number') {
+                html += `<div class="metric">
+                    <div class="metric-label">Commits (all-time)</div>
+                    <div class="metric-value">${student.metrics.commits_all_time}</div>
+                </div>`;
+            }
             html += `<div class="metric">
                 <div class="metric-label">Commit Days</div>
                 <div class="metric-value">${student.metrics.commit_days_7d}</div>
@@ -165,4 +171,3 @@ function escapeHtml(text) {
 
 // Load leaderboard on page load
 document.addEventListener('DOMContentLoaded', loadLeaderboard);
-
