@@ -17,6 +17,7 @@ subdomains=(
     "core-v1"
     "dormplate-v1"
     "finly-v1"
+    "finly"
     "firstshares-v1"
     "guidedgains-v1"
     "longlink-v1"

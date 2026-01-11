@@ -2,7 +2,7 @@
 
 Complete list of active subdomains for illinihunt.org student MVP applications.
 
-Last updated: 2025-11-01
+Last updated: 2025-12-07
 
 ## Student MVP Applications (Production)
 
@@ -16,17 +16,18 @@ These are the clean, non-versioned URLs for functional student applications.
 | `net-umbrella` | https://net-umbrella.illinihunt.org | Bolt.host | [Sirlizard/net-umbrella](https://github.com/Sirlizard/net-umbrella) |
 | `tonematchai` | https://tonematchai.illinihunt.org | Bolt.host | [BriHernandezz3/AI_Tone_Match_App](https://github.com/BriHernandezz3/AI_Tone_Match_App) |
 | `moneynova` | https://moneynova.illinihunt.org | Bolt.host | [anandjiwani/moneynova-1-bolt](https://github.com/anandjiwani/moneynova-1-bolt) |
+| `finly` | https://finly.illinihunt.org | Bolt.host | - |
 | `thinker` | https://thinker.illinihunt.org | Bolt.host | [hmlat2/thinker-app](https://github.com/hmlat2/thinker-app) |
-| `firstshares` | https://firstshares.illinihunt.org | Bolt.host | [gmonago2/FeaturesandAuth](https://github.com/gmonago2/FeaturesandAuth) |
+| `firstshares` | https://firstshares.illinihunt.org | Vercel | [gmonago2/FeaturesandAuth](https://github.com/gmonago2/FeaturesandAuth) |
 | `anchor` | https://anchor.illinihunt.org | Bolt.host | [pati3-oss/bolt_project](https://github.com/pati3-oss/bolt_project) |
 | `fridgemate` | https://fridgemate.illinihunt.org | Bolt.host | [holdenpquinn-lab/FridgeMate](https://github.com/holdenpquinn-lab/FridgeMate) |
 | `core` | https://core.illinihunt.org | Bolt.host | [muhammadalirizvi2005/CORE](https://github.com/muhammadalirizvi2005/CORE) |
-| `dormplate` | https://dormplate.illinihunt.org | Bolt.host | [cestein2-coder/Dorm-Plate](https://github.com/cestein2-coder/Dorm-Plate) |
+| `dormplate` | https://dormplate.illinihunt.org | Vercel | [cestein2-coder/Dorm-Plate](https://github.com/cestein2-coder/Dorm-Plate) |
 | `dresscode` | https://dresscode.illinihunt.org | Bolt.host | [kunalthoratt/Bolt_wardrobe_app](https://github.com/kunalthoratt/Bolt_wardrobe_app) |
 | `guidedgains` | https://guidedgains.illinihunt.org | Bolt.host | [whetstone261/GitHub](https://github.com/whetstone261/GitHub) |
 | `youngeru` | https://youngeru.illinihunt.org | Bolt.host | [iriszhou-dotcom/YoungerUApp](https://github.com/iriszhou-dotcom/YoungerUApp) |
 
-**Total MVP Applications:** 15
+**Total MVP Applications:** 16
 
 ## Pre-Launch Teaser Campaigns (Versioned)
 
@@ -65,10 +66,10 @@ These are versioned landing pages used for pre-launch marketing and teaser campa
 
 ## Summary
 
-- **Total Subdomains:** 41
-- **MVP Applications:** 15 (production apps)
+- **Total Subdomains:** 42
+- **MVP Applications:** 16 (production apps)
 - **Teaser Campaigns:** 26 (pre-launch landing pages)
-- **Platforms Supported:** Bolt.host (40), Vercel (1)
+- **Platforms Supported:** Bolt.host (39), Vercel (3)
 
 ## Status
 
