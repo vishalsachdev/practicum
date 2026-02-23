@@ -261,12 +261,6 @@ Students submit issue with same subdomain name, different URL. Script auto-detec
 - Proxied: true (Cloudflare proxy enabled)
 - Created automatically by workflow via Cloudflare API
 
-## Current Focus
-- [ ] [Update during /session-start]
-
-## Roadmap
-- [ ] [Add planned features]
-
 ## Session Log
 ### 2025-12-27
 - Initial roadmap sections added
